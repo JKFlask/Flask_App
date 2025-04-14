@@ -1,1 +1,155 @@
-index temp
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tree Explorer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f6f9fc;
+      color: #2c3e50;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      color: #1c3f60;
+    }
+
+    form {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    input[type="text"] {
+      padding: 10px 15px;
+      font-size: 1rem;
+      width: 60%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: #2c3e50;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-left: 10px;
+
+    }
+
+    button:hover {
+      background: #1c2f40;
+    }
+
+    .result {
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .grid-item {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .grid-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+
+      display: block;
+    }
+
+
+
+    h2 {
+      margin-bottom: 10px;
+      font-size: 1.5em;
+      color: #2c3e50;
+    }
+
+    .attributes {
+      font-size: 0.95em;
+      color: #444;
+      line-height: 1.6;
+    }
+
+    .attributes strong {
+      color: #2c3e50;
+    }
+
+    .no-results {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #999;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌿 Tree Explorer</h1>
+
+  <form method="POST">
+    <input type="text" name="query" placeholder="Search by name, location, species..." required>
+    <button type="submit">Search</button>
+  </form>
+
+  {% if results %}
+    {% for item in results %}
+      <div class="result">
+        <h2>{{ item.data['Common Name 1'] or item.data['Genus'] }}</h2>
+
+        <div class="attributes">
+          {% for key, value in item.data.items() %}
+            {% if value and value|lower != 'nan' %}
+              <strong>{{ key.replace('_', ' ').replace('Unnamed: 6', '').strip() }}:</strong> {{ value }}<br>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        {% if item.images %}
+          <div class="image-grid">
+            {% for img_url in item.images %}
+              <div class="grid-item">
+                <img src="{{ img_url }}" alt="Tree Image" loading="lazy">
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p><em>No images found.</em></p>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="no-results">
+      <p>Enter a search term to get started.</p>
+    </div>
+  {% endif %}
+
+</body>
+</html>
+
